@@ -1,0 +1,16 @@
+{
+  "type": "module",
+  "scripts": {
+    "test": "node --import tsx --test ./**/*.test.ts",
+    "start": "node --import tsx ./src/solutionRunner.ts",
+    "nodemon": "nodemon",
+    "tsc": "tsc --noEmit --watch --preserveWatchOutput"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "grid": "github:var-dev/grid",
+    "nodemon": "^3.1.11",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
