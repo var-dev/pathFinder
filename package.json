@@ -2,7 +2,8 @@
   "type": "module",
   "scripts": {
     "test": "node --import tsx --test ./**/*.test.ts",
-    "start": "node --import tsx ./src/solutionRunner.ts",
+    "startr": "node --import tsx ./src/solutionRunner.ts",
+    "starti": "node --import tsx ./src/iterativePathFinder",
     "nodemon": "nodemon",
     "tsc": "tsc --noEmit --watch --preserveWatchOutput"
   },

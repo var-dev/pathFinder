@@ -1,12 +1,14 @@
 import { describe, it } from "node:test";
 import * as assert from 'node:assert/strict';
 
-import type { Coordinate } from "../src/exampleSolutionSinglePath.js";
+import { singlePath, type Coordinate } from "../src/exampleSolutionSinglePath.js";
 import type { CoordinateStatus } from "../src/exampleReferenceMultiplePaths.js";
 
 
-import { findColumnIndex, cloneColumn, growStash } from "../src/iterativePathFinder.js";
+import { findColumnIndex, cloneColumn, growStash, iterativePathFinder } from "../src/solutionIterativePathFinder.js";
 
+import { multiplePaths } from "../src/exampleReferenceMultiplePaths.js";
+import { allPaths } from "../src/exampleSolutionAllPaths.js";
 
 describe("Verifying findColumnIndex to find column index in stash", ()=>{
   const stash: CoordinateStatus[][] = [
@@ -115,6 +117,40 @@ describe('Here is how stash should be growing', ()=>{
 
     assert.deepStrictEqual(structuredClone(stash), structuredClone(expectedNewStash))
   })
+    it("should alternate between 2 columns after fork",()=>{
+    const expectedNewStash: CoordinateStatus[][] = [
+      [{ x: 1, y: 1, status: "N" }, { x: 10, y: 2, status: "N" },],
+      [{ x: 1, y: 3, status: "N" }, { x: 1, y: 4, status: "F" }, { x: 1, y: 3, status: "N" }, { x: 1, y: 2, status: "N" }, { x: 10, y: 2, status: "N" },],
+      [{ x: 1, y: 5, status: "N" }, { x: 1, y: 4, status: "F" }, { x: 1, y: 3, status: "N" }, { x: 1, y: 2, status: "N" }, { x: 10, y: 2, status: "N" },],
+    ]
+    growStash({ x: 1, y: 4, status: "F" }, stash)
+    growStash({ x: 1, y: 3, status: "N" }, stash)
+    growStash({ x: 1, y: 5, status: "N" }, stash)
+
+    assert.deepStrictEqual(structuredClone(stash), structuredClone(expectedNewStash))
+  })
+})
+
+describe('Confirming iterativePathFinder can split paths', ()=>{
+  it("should find all paths",()=>{
+    const actual = iterativePathFinder(multiplePaths)
+    const expected = allPaths
+
+    assert.deepStrictEqual(structuredClone(actual), structuredClone(expected))
+  })
+    it("should match the reference path to Exit",()=>{
+    const allPaths = iterativePathFinder(multiplePaths)
+    const extractedExitPath  = structuredClone(allPaths[(findColumnIndex(-1,-1, allPaths) as number)])
+    extractedExitPath!.pop() // remove bogus point {x: -1, y: -1, status: ""}
+    extractedExitPath?.reverse() // reverse to match reference path
+    extractedExitPath!.pop() // remove 1,1 point
+    const actualExitPath = extractedExitPath?.map((point)=>({x: point.x,y: point.y})) //normalize to {x,y} form
+    const expected = singlePath
+
+    assert.strictEqual(extractedExitPath?.length, expected.length)
+    assert.strictEqual(JSON.stringify(actualExitPath), JSON.stringify(expected))
+  })
 })
 
 
+//findColumnIndex(3,1, stash)
